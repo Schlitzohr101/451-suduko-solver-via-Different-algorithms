@@ -18,12 +18,18 @@ Optional (extra credit in write-up):
   - Collect stats: time, nodes expanded, max frontier
 """
 
+from operator import sub, truediv
 import random
 import heapq
 import time
 import os
+from enum import Enum
 from pathlib import Path
 from typing import List, Tuple, Optional, Set
+
+# SubBoxesRows = Enum('SubBoxRows', [('Top', 1),('Middle',2),('Bottom',3)])
+
+# SubBoxesCols = Enum('SubBoxCols', [('Left', 1), ('Middle',2), ('Right',3)])
 
 # Get workspace directory
 WORKSPACE_DIR = os.getcwd()  # Current working directory
@@ -153,15 +159,36 @@ def in_col(grid: Grid, col: int, num: int) -> bool:
 
 
 def in_box(grid: Grid, row: int, col: int, num: int) -> bool:
-    """
-    Returns True iff `num` already appears in the 3x3 subgrid containing (row, col).
-
-    TODO:
-      - Compute top-left corner of the 3x3 box: (row//3)*3, (col//3)*3
-      - Check the 9 cells of that box for `num`.
-    """
-    # TODO
-    raise NotImplementedError("in_box: check 3x3 box membership")
+  subBoxRangeTup = (
+    ( (row // 3) * 3 , ((row // 3) * 3) + 2 ),
+    ( (col // 3) * 3 , ((col // 3) * 3) + 2 )
+  )
+  print(subBoxRangeTup)
+  rowCounter = subBoxRangeTup[0][0]
+  while rowCounter <= subBoxRangeTup[0][1]: #check all rows in the range
+    colCounter = subBoxRangeTup[1][0]
+    while colCounter <= subBoxRangeTup[1][1]:
+      if grid[rowCounter][colCounter] == num:
+        return True
+      colCounter+=1
+    rowCounter+=1
+  return False    
+  
+    # """
+    # Returns True iff `num` already appears in the 3x3 subgrid containing (row, col).
+    # sub grid is the 3x3 grid that contains the cell (row, col), need to see how to find row and col are of specific subgrids...
+    # start with establishing the 9 different subgrids...
+    #     top left, row 0 - 3 and col 0 - 3
+    #     top middle, row 0 - 3 and col 3 - 6
+    #     top right, row 0 - 3 and col 6 - 9
+        
+    #     middle left
+    # TODO:
+    #   - Compute top-left corner of the 3x3 box: (row//3)*3, (col//3)*3
+    #   - Check the 9 cells of that box for `num`.
+    # """
+    # # TODO
+    # raise NotImplementedError("in_box: check 3x3 box membership")
 
 
 def is_valid(grid: Grid, row: int, col: int, num: int) -> bool:
@@ -416,6 +443,8 @@ if __name__ == "__main__":
     # puzzle = load_sudoku()
     puzzle = load_sudoku_from_file("Sudoku_Puzzles.txt")
     print(puzzle)
+
+    print(in_box(puzzle, 0, 1, 4))
 
     # print("Loaded Sudoku:")
     # print_sudoku(puzzle)
