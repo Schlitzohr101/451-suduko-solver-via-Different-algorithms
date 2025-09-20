@@ -19,6 +19,7 @@ Optional (extra credit in write-up):
 """
 
 from operator import sub, truediv
+from pdb import run
 import random
 import heapq
 import time
@@ -298,24 +299,52 @@ def has_duplicates(values: List[int]) -> bool:
       - Filter out zeros.
       - Compare length to length of set.
     """
-    # TODO
-    raise NotImplementedError("has_duplicates: detect duplicates excluding zeros")
-
+    runningList = []
+    for val in values:
+      if val != 0:
+        if val in runningList:
+          return True
+        runningList.append(val)
+    return False
 
 def is_goal(grid: Grid) -> bool:
-    """
-    Returns True iff:
-      - There are NO zeros in the grid, and
-      - Every row, column, and 3x3 subgrid contains digits 1..9 with no duplicates.
+  #check if zeros
+  subBoxRow = [[],[],[]]
+  cols = [[], [], [], [], [], [], [], [], []]
+  rowCount = 1
+  for row in grid:
+    if has_duplicates(row):
+      return False
+    for col in range(row):
+      if row[col] == 0:
+        return False
+      cols[col] = row[col]
+      subBoxRow[col//3]
+    if rowCount+1 % 3 == 1: #if the next row is a change for subBox
+      for subBox in subBoxRow:
+        if has_duplicates(subBox):
+          return False
+      subBoxRow = [[],[],[]] #reset subbox row
+    rowCount += 1
+  
+  for col in cols:
+    if has_duplicates(col):
+      return False
+      
+  return True
+  """
+  Returns True iff:
+    - There are NO zeros in the grid, and
+    - Every row, column, and 3x3 subgrid contains digits 1..9 with no duplicates.
 
-    TODO:
-      - Check every row (use has_duplicates).
-      - Check every column (build a list and use has_duplicates).
-      - Check each 3x3 box (build a list and use has_duplicates).
-      - Ensure no zeros remain.
-    """
-    # TODO
-    raise NotImplementedError("is_goal: verify solved Sudoku")
+  TODO:
+    - Check every row (use has_duplicates).
+    - Check every column (build a list and use has_duplicates).
+    - Check each 3x3 box (build a list and use has_duplicates).
+    - Ensure no zeros remain.
+  """
+
+
 
 
 # ========================
