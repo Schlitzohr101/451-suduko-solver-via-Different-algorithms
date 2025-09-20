@@ -135,25 +135,21 @@ def load_sudoku_from_file(filename: str = "Sudoku_Puzzles.txt") -> Grid:
 # ========================
 
 def in_row(grid: Grid, row: int, num: int) -> bool:
-    """
-    Returns True iff `num` already appears in row `row`.
-
-    TODO:
-      - Scan the given row and check if num is present.
-    """
-    # TODO
-    raise NotImplementedError("in_row: check row membership")
-
+    return num in grid[row]
 
 def in_col(grid: Grid, col: int, num: int) -> bool:
-    """
-    Returns True iff `num` already appears in column `col`.
+    # """
+    # Returns True iff `num` already appears in column `col`.
 
-    TODO:
-      - Scan the given column and check if num is present.
-    """
-    # TODO
-    raise NotImplementedError("in_col: check column membership")
+    # TODO:
+    #   - Scan the given column and check if num is present.
+    # """
+    # # TODO
+    # raise NotImplementedError("in_col: check column membership")
+    in_col = False
+    for row in grid:
+      in_col = (in_col or num == row[col])
+    return in_col
 
 
 def in_box(grid: Grid, row: int, col: int, num: int) -> bool:
