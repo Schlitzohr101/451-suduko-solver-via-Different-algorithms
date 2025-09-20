@@ -229,9 +229,12 @@ def find_first_empty(grid: Grid) -> Optional[Tuple[int, int]]:
       - Scan grid rows 0..8 and cols 0..8; return the first cell with value 0.
       - If none, return None.
     """
-    # TODO
-    raise NotImplementedError("find_first_empty: locate first zero cell")
-
+    for row in range(len(grid)):
+      for col in range(len(grid[row])):
+        if grid[row][col] == 0:
+          return (row,col)
+    return None
+    
 
 def find_most_constrained_cell(grid: Grid) -> Optional[Tuple[int, int, List[int]]]:
     """
@@ -244,9 +247,20 @@ def find_most_constrained_cell(grid: Grid) -> Optional[Tuple[int, int, List[int]
       - If multiple cells tie, any is fine (document your tie-breaking).
       - If no empty cells, return None.
     """
-    # TODO
-    raise NotImplementedError("find_most_constrained_cell: implement MCV selection")
-
+    smallestDomain = []
+    smallestDomainSize = 1000
+    smallestDomainPos = (10,10)
+    for row in range(len(grid)):
+      for col in range(len(grid[row])):
+        if grid[row][col] == 0: #if empty
+          currDomain = legal_values(grid,row,col)
+          if (len(currDomain) < smallestDomainSize):
+            smallestDomain = currDomain
+            smallestDomainSize = len(currDomain)
+            smallestDomainPos = (row,col)
+    if smallestDomain != []:
+       return (smallestDomainPos[0],smallestDomainPos[1],smallestDomain)  
+    return None    
 
 def get_successors(grid: Grid, use_mcv: bool = True, use_lcv: bool = False) -> List[Grid]:
     """
