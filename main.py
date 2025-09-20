@@ -21,7 +21,14 @@ Optional (extra credit in write-up):
 import random
 import heapq
 import time
+import os
+from pathlib import Path
 from typing import List, Tuple, Optional, Set
+
+# Get workspace directory
+WORKSPACE_DIR = os.getcwd()  # Current working directory
+# Alternative: WORKSPACE_DIR = Path.cwd()  # Using pathlib
+# Alternative: WORKSPACE_DIR = os.path.dirname(os.path.abspath(__file__))  # Script directory
 
 Grid = List[List[int]]
 
@@ -30,23 +37,76 @@ Grid = List[List[int]]
 # ========================
 
 def load_sudoku() -> Grid:
+    puzzles = {
+        "puzzle1": [
+            [5, 3, 0, 0, 7, 0, 0, 0, 0],
+            [6, 0, 0, 1, 9, 5, 0, 0, 0],
+            [0, 9, 8, 0, 0, 0, 0, 6, 0],
+            [8, 0, 0, 0, 6, 0, 0, 0, 3],
+            [4, 0, 0, 8, 0, 3, 0, 0, 1],
+            [7, 0, 0, 0, 2, 0, 0, 0, 6],
+            [0, 6, 0, 0, 0, 0, 2, 8, 0],
+            [0, 0, 0, 4, 1, 9, 0, 0, 5],
+            [0, 0, 0, 0, 8, 0, 0, 7, 9]
+        ],
+        "puzzle2": [
+            ],
+    }
     """
     Returns a randomly chosen Sudoku puzzle from a predefined list.
 
     TODO:
       - Create a Python list named `puzzles` containing multiple 9x9 grids.
-      puzzles = []
       - Represent each grid as a list of lists of ints, where 0 means empty.
       - Return a random choice from that list.
 
     Example row format for one puzzle (9 lines of 9 digits):
       [5, 3, 0, 0, 7, 0, 0, 0, 0]
     """
+    '''
     # TODO: build and return a random puzzle from a predefined list
     raise NotImplementedError("load_sudoku: return a random predefined puzzle")
+    '''
 
 
 def load_sudoku_from_file(filename: str = "Sudoku_Puzzles.txt") -> Grid:
+  finalGrid = Grid
+  try:
+    # Use workspace directory to construct full path
+    filepath = os.path.join(WORKSPACE_DIR, filename)
+    with open(filepath, 'r') as file:
+      puzzles = file.read()
+      puzzles = puzzles.split('\n')
+      puzzleChoices = []
+      currentPuzzle = []
+      for puzzleRow in puzzles:
+        if (puzzleRow == ''):
+          puzzleChoices.append(currentPuzzle)
+          currentPuzzle = []
+        else:
+          currentPuzzle.append(puzzleRow)
+      gridChoices = []
+      tempGrid = []
+
+      for puzzle in puzzleChoices:
+        for puzzleRow in puzzle:
+          
+          tempGrid.append([int(char) for char in puzzleRow if char.isdigit()])
+        gridChoices.append(tempGrid)
+        tempGrid = []
+      
+      return random.choice(gridChoices)
+      # puzzles = [[int(num) for num in puzzle] for puzzle in puzzles]
+      # return random.choice(puzzles)
+  except FileNotFoundError:
+    raise FileNotFoundError("load_sudoku_from_file: file not found")
+  except ValueError:
+    raise ValueError("error reading from file...")
+  except TypeError:
+    raise TypeError("error reading from file...")
+  except Exception as e:
+    raise Exception("unknown error reading from file...")
+    
     """
     Loads Sudoku puzzles from a text file and returns a random one.
 
@@ -341,6 +401,7 @@ def print_sudoku(grid: Grid) -> None:
 
 
 if __name__ == "__main__":
+  
     """
     Demo harness for your solver.
 
@@ -357,7 +418,8 @@ if __name__ == "__main__":
 
     # Choose ONE loader:
     # puzzle = load_sudoku()
-    # puzzle = load_sudoku_from_file("Sudoku_Puzzles.txt")
+    puzzle = load_sudoku_from_file("Sudoku_Puzzles.txt")
+    print(puzzle)
 
     # print("Loaded Sudoku:")
     # print_sudoku(puzzle)
