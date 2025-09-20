@@ -196,9 +196,10 @@ def is_valid(grid: Grid, row: int, col: int, num: int) -> bool:
       - Return False if `num` is in the same row, column, or 3x3 box.
       - Otherwise return True.
     """
-    # TODO
-    raise NotImplementedError("is_valid: enforce Sudoku constraints")
-
+    if grid[row][col] != 0 or in_col(grid,col,num) or in_row(grid,row,num) or in_box(grid,row,col,num):
+      return False
+    return True
+    
 
 def legal_values(grid: Grid, row: int, col: int) -> List[int]:
     """
@@ -208,10 +209,14 @@ def legal_values(grid: Grid, row: int, col: int) -> List[int]:
       - If the cell is not empty, return [].
       - Test 1..9 with is_valid and collect valid ones.
     """
-    # TODO
-    raise NotImplementedError("legal_values: compute domain for a cell")
-
-
+    possibleVals = []
+    if grid[row][col] != 0:
+      return possibleVals
+    for i in range(1,10):
+      if is_valid(grid, row, col, i):
+        possibleVals.append(i)
+    return possibleVals
+    
 # ========================
 # Step 3: Successor Function
 # ========================
