@@ -159,15 +159,17 @@ def in_col(grid: Grid, col: int, num: int) -> bool:
 
 
 def in_box(grid: Grid, row: int, col: int, num: int) -> bool:
-  subBoxRangeTup = (
-    ( (row // 3) * 3 , ((row // 3) * 3) + 2 ),
-    ( (col // 3) * 3 , ((col // 3) * 3) + 2 )
-  )
-  print(subBoxRangeTup)
-  rowCounter = subBoxRangeTup[0][0]
-  while rowCounter <= subBoxRangeTup[0][1]: #check all rows in the range
-    colCounter = subBoxRangeTup[1][0]
-    while colCounter <= subBoxRangeTup[1][1]:
+  # subBoxRangeTup = (
+  #   ( (row // 3) * 3 , ((row // 3) * 3) + 2 ),
+  #   ( (col // 3) * 3 , ((col // 3) * 3) + 2 )
+  # )
+  subBoxRowFloor= (row//3) * 3
+  subBoxColFloor= (col//3) * 3
+
+  rowCounter = subBoxRowFloor
+  while rowCounter <= subBoxRowFloor + 2: #check all rows in the range
+    colCounter = subBoxColFloor
+    while colCounter <= subBoxColFloor + 2:
       if grid[rowCounter][colCounter] == num:
         return True
       colCounter+=1
@@ -176,13 +178,7 @@ def in_box(grid: Grid, row: int, col: int, num: int) -> bool:
   
     # """
     # Returns True iff `num` already appears in the 3x3 subgrid containing (row, col).
-    # sub grid is the 3x3 grid that contains the cell (row, col), need to see how to find row and col are of specific subgrids...
-    # start with establishing the 9 different subgrids...
-    #     top left, row 0 - 3 and col 0 - 3
-    #     top middle, row 0 - 3 and col 3 - 6
-    #     top right, row 0 - 3 and col 6 - 9
-        
-    #     middle left
+
     # TODO:
     #   - Compute top-left corner of the 3x3 box: (row//3)*3, (col//3)*3
     #   - Check the 9 cells of that box for `num`.
@@ -444,7 +440,7 @@ if __name__ == "__main__":
     puzzle = load_sudoku_from_file("Sudoku_Puzzles.txt")
     print(puzzle)
 
-    print(in_box(puzzle, 0, 1, 4))
+    print(in_box(puzzle, 0, 1, 5))
 
     # print("Loaded Sudoku:")
     # print_sudoku(puzzle)
