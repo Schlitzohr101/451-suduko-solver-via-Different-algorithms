@@ -352,16 +352,22 @@ def is_goal(grid: Grid) -> bool:
 # ========================
 
 def heuristic(grid: Grid) -> int:
-    """
-    Heuristic for A*.
-    Baseline option: number of empty cells (lower is better).
+  zeroCount = 0
+  for row in grid:
+    for item in row:
+      if item == 0 : zeroCount+=1
+  return zeroCount
 
-    TODO:
-      - Count and return how many cells are 0.
-      - (Optional) Propose/document an alternative admissible heuristic in your write-up.
-    """
-    # TODO
-    raise NotImplementedError("heuristic: estimate remaining work")
+  """
+  Heuristic for A*.
+  Baseline option: number of empty cells (lower is better).
+
+  TODO:
+    - Count and return how many cells are 0.
+    - (Optional) Propose/document an alternative admissible heuristic in your write-up.
+  """
+  # TODO
+  raise NotImplementedError("heuristic: estimate remaining work")
 
 
 def grid_to_key(grid: Grid):
