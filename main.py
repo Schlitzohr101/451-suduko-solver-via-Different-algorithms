@@ -365,12 +365,13 @@ def heuristic(grid: Grid) -> int:
   TODO:
     - Count and return how many cells are 0.
     - (Optional) Propose/document an alternative admissible heuristic in your write-up.
-  """
+
   # TODO
   raise NotImplementedError("heuristic: estimate remaining work")
-
+  """
 
 def grid_to_key(grid: Grid):
+    return tuple(tuple(row) for row in grid)
     """
     Converts the grid to an immutable, hashable key for visited/frontier sets.
 
