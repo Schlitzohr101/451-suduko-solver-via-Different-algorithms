@@ -589,7 +589,7 @@ def solve_dfs(start: Grid,
     successors = get_successors(curr_grid, use_mcv, use_lcv)
     
     #successors come in as list, but that list needs to have its order preserved for stack...
-    for i in range(start=len(successors)-1,stop=0,step=-1): #last goes first
+    for i in range(len(successors)-1,0,-1): #last goes first
       state_key = grid_to_key(successors[i])
       if state_key in visited:
         continue
