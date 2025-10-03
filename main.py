@@ -338,22 +338,22 @@ def has_duplicates(values: List[int]) -> bool:
 def is_goal(grid: Grid) -> bool:
   #check if zeros
   subBoxRow = [[],[],[]]
-  cols = [[], [], [], [], [], [], [], [], []]
-  rowCount = 1
+  cols = [[0 for _ in range(10)] for _ in range(10)]
+  row_count = 1
   for row in grid:
     if has_duplicates(row):
       return False
-    for col in range(row):
+    for col in range(len(row)):
       if row[col] == 0:
         return False
-      cols[col] = row[col]
+      cols[col][row_count] = row[col]
       subBoxRow[col//3]
-    if rowCount+1 % 3 == 1: #if the next row is a change for subBox
+    if row_count+1 % 3 == 1: #if the next row is a change for subBox
       for subBox in subBoxRow:
         if has_duplicates(subBox):
           return False
       subBoxRow = [[],[],[]] #reset subbox row
-    rowCount += 1
+    row_count += 1
   
   for col in cols:
     if has_duplicates(col):
@@ -550,15 +550,32 @@ def solve_bfs(start: Grid):
 # ========================
 
 def print_sudoku(grid: Grid) -> None:
-    """
-    Pretty-prints a 9x9 Sudoku grid.
+  final_str = ""
+  grid_key = grid_to_key(grid)
+  row_count = 0
+  for row in grid_key:
+    final_str += ("\n- - - | - - - | - - -\n" if row_count % 3 == 0 else "\n")
+    
+    cell_count = 1
+    for cell in row:
+      final_str += str(cell)
+      final_str += (" | " if cell_count%3 == 0 and cell_count > 0 and cell_count < 8 else " ")
+      cell_count += 1
+    row_count += 1
+  final_str += ("\n- - - | - - - | - - -\n")
+  print(final_str)
+  
+  
+  # """
 
-    TODO:
-      - Print rows with '.' for zeros.
-      - Add separators every 3 rows and 3 columns to improve readability.
-    """
-    # TODO
-    raise NotImplementedError("print_sudoku: format and print the board")
+  # Pretty-prints a 9x9 Sudoku grid.
+
+  # TODO:
+  #   - Print rows with '.' for zeros.
+  #   - Add separators every 3 rows and 3 columns to improve readability.
+  # """
+  # # TODO
+  # raise NotImplementedError("print_sudoku: format and print the board")
 
 
 if __name__ == "__main__":
