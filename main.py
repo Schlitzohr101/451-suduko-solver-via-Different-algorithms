@@ -677,76 +677,94 @@ def print_sudoku(grid: Grid) -> None:
 
 
 if __name__ == "__main__":
+
+  """
+  Demo harness for your solver.
+
+  TODO:
+    - Uncomment ONE of the loaders below.
+    - Print the loaded puzzle.
+    - Run A* and DFS; print their stats and (if solved) the solution.
+    - For your experiments, time multiple puzzles and compare:
+        * time (seconds)
+        * nodes expanded
+        * max frontier size
+    - Save or screenshot before/after boards for your write-up.
+  """
+
+  # Choose ONE loader:
+  # puzzle = load_sudoku()
+  # puzzle = load_sudoku_from_file("Sudoku_Puzzles.txt")
+
+  # print("Loaded Sudoku:")
+  # print_sudoku(puzzle)
+
+  # # A* solve:
+  # a_solution, a_stats = a_star_sudoku(puzzle, use_mcv=True, use_lcv=False, time_limit=10)
+  # print("A* stats:", a_stats)
+  # if a_solution:
+  #     print("Solved (A*):")
+  #     print_sudoku(a_solution)
+
+  # # DFS solve:
+  # d_solution, d_stats = solve_dfs(puzzle, use_mcv=True, use_lcv=True, time_limit=10)
+  # print("DFS stats:", d_stats)
+  # if d_solution:
+  #     print("Solved (DFS):")
+  #     print_sudoku(d_solution)
+
+  # (Optional) BFS:
+  # b_solution, b_stats = solve_bfs(puzzle)
+  # print("BFS stats:", b_stats)
+  # if b_solution:
+  #     print("Solved (BFS):")
+  #     print_sudoku(b_solution)
   
-    """
-    Demo harness for your solver.
+  search_algs = Enum("Search algorithms","A_star DFS")
+  prob_diff = Enum("problem difficulty","Easy Medium Hard")
+  
+  expirement_stats = []
+  
+  #EXPIREMENTS
+  #1. Running A* and DFS with Easy Medium and Hard puzzles
+  #Easy
+  puzzle = load_sudoku_from_file("Sudoku_Puzzles.txt")
+  easy_puzzle = puzzle
+  expirement_stats.append( (search_algs.A_star, prob_diff.Easy, a_star_sudoku(puzzle,time_limit=10))  )
+  expirement_stats.append( (search_algs.DFS, prob_diff.Easy, solve_dfs(puzzle, time_limit=10)))
+  
+  #Medium
+  puzzle = load_sudoku_from_file("Sudoku_Puzzles_Medium.txt")
+  med_puzzle = puzzle
+  expirement_stats.append( (search_algs.A_star, prob_diff.Medium, a_star_sudoku(puzzle,time_limit=10))  )
+  expirement_stats.append( (search_algs.DFS, prob_diff.Medium, solve_dfs(puzzle, time_limit=10)))
 
-    TODO:
-      - Uncomment ONE of the loaders below.
-      - Print the loaded puzzle.
-      - Run A* and DFS; print their stats and (if solved) the solution.
-      - For your experiments, time multiple puzzles and compare:
-          * time (seconds)
-          * nodes expanded
-          * max frontier size
-      - Save or screenshot before/after boards for your write-up.
-    """
+  #Hard
+  puzzle = load_sudoku_from_file("Sudoku_Puzzles_Hard.txt")
+  hard_puzzle = puzzle
+  expirement_stats.append( (search_algs.A_star, prob_diff.Medium, a_star_sudoku(puzzle,time_limit=10))  )
+  expirement_stats.append( (search_algs.DFS, prob_diff.Medium, solve_dfs(puzzle, time_limit=10)))
 
-    # Choose ONE loader:
-    # puzzle = load_sudoku()
-    # puzzle = load_sudoku_from_file("Sudoku_Puzzles.txt")
+  A_star_stats = []
+  DFS_stats = []
 
-    # print("Loaded Sudoku:")
-    # print_sudoku(puzzle)
-
-    # # A* solve:
-    # a_solution, a_stats = a_star_sudoku(puzzle, use_mcv=True, use_lcv=False, time_limit=10)
-    # print("A* stats:", a_stats)
-    # if a_solution:
-    #     print("Solved (A*):")
-    #     print_sudoku(a_solution)
-
-    # # DFS solve:
-    # d_solution, d_stats = solve_dfs(puzzle, use_mcv=True, use_lcv=True, time_limit=10)
-    # print("DFS stats:", d_stats)
-    # if d_solution:
-    #     print("Solved (DFS):")
-    #     print_sudoku(d_solution)
-
-    # (Optional) BFS:
-    # b_solution, b_stats = solve_bfs(puzzle)
-    # print("BFS stats:", b_stats)
-    # if b_solution:
-    #     print("Solved (BFS):")
-    #     print_sudoku(b_solution)
-    
-    search_algs = Enum("Search algorithms","A_star DFS")
-    prob_diff = Enum("problem difficulty","Easy Medium Hard")
-    
-    expirement_stats = []
-    
-    #EXPIREMENTS
-    #1. Running A* and DFS with Easy Medium and Hard puzzles
-    #Easy
-    puzzle = load_sudoku_from_file("Sudoku_Puzzles.txt")
-    expirement_stats.append( (search_algs.A_star, prob_diff.Easy, a_star_sudoku(puzzle,time_limit=10))  )
-    expirement_stats.append( (search_algs.DFS, prob_diff.Easy, solve_dfs(puzzle, time_limit=10)))
-    
-    #Medium
-    puzzle = load_sudoku_from_file("Sudoko_Puzzles_Medium.txt")
-    expirement_stats.append( (search_algs.A_star, prob_diff.Medium, a_star_sudoku(puzzle,time_limit=10))  )
-    expirement_stats.append( (search_algs.DFS, prob_diff.Medium, solve_dfs(puzzle, time_limit=10)))
-
-    #Hard
-    puzzle = load_sudoku_from_file("Sudoko_Puzzles_Hard.txt")
-    expirement_stats.append( (search_algs.A_star, prob_diff.Medium, a_star_sudoku(puzzle,time_limit=10))  )
-    expirement_stats.append( (search_algs.DFS, prob_diff.Medium, solve_dfs(puzzle, time_limit=10)))
-
-    A_star_stats = []
-
-    for stat_group in expirement_stats:
-      match stat_group[0]:
-        case search_algs.A_star:
-          A_star_stats.append(stat_group[2])
-        case _:
-          raise("issue with handling of search algs Enum for stat sorting...")
+  for stat_group in expirement_stats:
+    match stat_group[0]:
+      case search_algs.A_star:
+        A_star_stats.append((stat_group[1],stat_group[2]))
+      case search_algs.DFS:
+        DFS_stats.append((stat_group[1],stat_group[2]))
+      case _:
+        raise("issue with handling of search algs Enum for stat sorting...")
+      
+  print("Expriement results...")
+  print("Easy puzzle:")
+  print_sudoku(easy_puzzle)
+  print("A_star:",end="\n")
+  for stats_group in A_star_stats:
+    match stats_group[0]:
+      case prob_diff.Easy:
+        print("successful A * search" if stats_group[1][1]["success"] else "A * search failed")
+        print_sudoku(stats_group[1][0]) if stats_group[1][1]["success"] else print()
+      case _:
+        continue
