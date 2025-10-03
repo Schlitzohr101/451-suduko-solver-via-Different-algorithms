@@ -285,7 +285,7 @@ def get_successors(grid: Grid, use_mcv: bool = True, use_lcv: bool = False) -> L
     raise NotImplementedError("get_successors: order candidates using LCV")
     # maybe implemnt later...
 
-  for value in candidates:
+  for value in candidates: #for each value in the possible candidates create states with the values and add to succ
     new_grid = copy.deepcopy(grid)
     new_grid[row][col] = value
     successors.append(new_grid)
@@ -449,6 +449,28 @@ def a_star_sudoku(start: Grid,
                 )
       #not goal, so lets expand more...
       nodesExpanded += 1
+      succesors = get_successors(grid_curr, use_mcv, use_lcv)
+      
+      for state in succesors:
+        state_key = grid_to_key(state)
+        if state_key in visited:
+          continue
+        else:
+          visited.add(state_key)
+        
+        #calc scores for this state
+        state_g = g_curr + 1
+        state_h = heuristic(state_key)
+        state_f = state_g + state_h
+        
+        # add state with scores to frontier
+        heapq.heappush(frontier, (state_f, state_g, tie_breaker, state))
+    #if we get here we failed
+    return None, {
+      "success": False,
+      "nodes_expanded": nodesExpanded,
+      "max_frontier": maxFrontier,
+      "time": time.time() - startTime}
       
         
     """
