@@ -720,10 +720,33 @@ if __name__ == "__main__":
     #     print("Solved (BFS):")
     #     print_sudoku(b_solution)
     
-    search_algs = Enum("A_star","DFS")
+    search_algs = Enum("Search algorithms","A_star DFS")
+    prob_diff = Enum("problem difficulty","Easy Medium Hard")
     
     expirement_stats = []
     
     #EXPIREMENTS
     #1. Running A* and DFS with Easy Medium and Hard puzzles
-    expirement_stats.append
+    #Easy
+    puzzle = load_sudoku_from_file("Sudoku_Puzzles.txt")
+    expirement_stats.append( (search_algs.A_star, prob_diff.Easy, a_star_sudoku(puzzle,time_limit=10))  )
+    expirement_stats.append( (search_algs.DFS, prob_diff.Easy, solve_dfs(puzzle, time_limit=10)))
+    
+    #Medium
+    puzzle = load_sudoku_from_file("Sudoko_Puzzles_Medium.txt")
+    expirement_stats.append( (search_algs.A_star, prob_diff.Medium, a_star_sudoku(puzzle,time_limit=10))  )
+    expirement_stats.append( (search_algs.DFS, prob_diff.Medium, solve_dfs(puzzle, time_limit=10)))
+
+    #Hard
+    puzzle = load_sudoku_from_file("Sudoko_Puzzles_Hard.txt")
+    expirement_stats.append( (search_algs.A_star, prob_diff.Medium, a_star_sudoku(puzzle,time_limit=10))  )
+    expirement_stats.append( (search_algs.DFS, prob_diff.Medium, solve_dfs(puzzle, time_limit=10)))
+
+    A_star_stats = []
+
+    for stat_group in expirement_stats:
+      match stat_group[0]:
+        case search_algs.A_star:
+          A_star_stats.append(stat_group[2])
+        case _:
+          raise("issue with handling of search algs Enum for stat sorting...")
