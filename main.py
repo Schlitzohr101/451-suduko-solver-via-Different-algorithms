@@ -580,19 +580,17 @@ if __name__ == "__main__":
     # Choose ONE loader:
     # puzzle = load_sudoku()
     puzzle = load_sudoku_from_file("Sudoku_Puzzles.txt")
-    print(puzzle)
 
-    print(in_box(puzzle, 0, 1, 5))
 
-    # print("Loaded Sudoku:")
-    # print_sudoku(puzzle)
+    print("Loaded Sudoku:")
+    print_sudoku(puzzle)
 
     # A* solve:
-    # a_solution, a_stats = a_star_sudoku(puzzle, use_mcv=True, use_lcv=False, time_limit=10)
-    # print("A* stats:", a_stats)
-    # if a_solution:
-    #     print("Solved (A*):")
-    #     print_sudoku(a_solution)
+    a_solution, a_stats = a_star_sudoku(puzzle, use_mcv=True, use_lcv=False, time_limit=10)
+    print("A* stats:", a_stats)
+    if a_solution:
+        print("Solved (A*):")
+        print_sudoku(a_solution)
 
     # DFS solve:
     # d_solution, d_stats = solve_dfs(puzzle, use_mcv=True, use_lcv=True, time_limit=10)
