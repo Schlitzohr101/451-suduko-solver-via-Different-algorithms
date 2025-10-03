@@ -18,6 +18,7 @@ Optional (extra credit in write-up):
   - Collect stats: time, nodes expanded, max frontier
 """
 
+import copy
 from operator import sub, truediv
 from pdb import run
 import random
@@ -264,28 +265,54 @@ def find_most_constrained_cell(grid: Grid) -> Optional[Tuple[int, int, List[int]
     return None    
 
 def get_successors(grid: Grid, use_mcv: bool = True, use_lcv: bool = False) -> List[Grid]:
+  successors = []
+  #lcv is the 
+  if use_mcv:
+    result = find_most_constrained_cell(grid)
+    if result == None:
+      return successors
+    (row, col, domain) = result
+    candidates = domain
   
-    """
-    Generates next states by filling ONE empty cell with each valid value.
+  else:
+    empty_cell_pos = find_first_empty(grid)
+    if empty_cell_pos == None:
+      return successors
+    row, col = empty_cell_pos
+    candidates = legal_values(grid, row, col)
+    
+  if use_lcv:
+    raise NotImplementedError("get_successors: order candidates using LCV")
+    # maybe implemnt later...
 
-    Parameters:
-      - use_mcv: If True, choose the Most Constrained Variable (fewest legal values).
-                 If False, choose the first empty cell in row-major order.
-      - use_lcv: If True, order candidate values using Least Constraining Value (optional).
+  for value in candidates:
+    new_grid = copy.deepcopy(grid)
+    new_grid[row][col] = value
+    successors.append(new_grid)
+  return successors
+  
+  
+  """
+  Generates next states by filling ONE empty cell with each valid value.
 
-    TODO:
-      - Choose (r, c) either by MCV or first-empty.
-      - Compute candidate values via legal_values(grid, r, c).
-      - If use_lcv is True: order candidates by how few constraints they impose
-        on neighbors (row, column, box). (Lower impact first.)
-      - For each candidate value v:
-          * Copy the grid
-          * Set new_grid[r][c] = v
-          * Append to the successor list
-      - Return the list of new grids.
-    """
-    # TODO
-    raise NotImplementedError("get_successors: generate valid child states")
+  Parameters:
+    - use_mcv: If True, choose the Most Constrained Variable (fewest legal values).
+                If False, choose the first empty cell in row-major order.
+    - use_lcv: If True, order candidate values using Least Constraining Value (optional).
+
+  TODO:
+    - Choose (r, c) either by MCV or first-empty.
+    - Compute candidate values via legal_values(grid, r, c).
+    - If use_lcv is True: order candidates by how few constraints they impose
+      on neighbors (row, column, box). (Lower impact first.)
+    - For each candidate value v:
+        * Copy the grid
+        * Set new_grid[r][c] = v
+        * Append to the successor list
+    - Return the list of new grids.
+  """
+  # TODO
+  raise NotImplementedError("get_successors: generate valid child states")
 
 
 # ========================
