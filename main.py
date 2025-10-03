@@ -580,7 +580,7 @@ def solve_dfs(start: Grid,
       continue
     
     if is_goal(curr_grid):
-      return {"success": True, 
+      return curr_grid, {"success": True, 
                  "nodes_expanded": nodes_expanded,
                  "max_frontier": max_frontier,
                  "time": time.time() - start_time}
@@ -589,12 +589,12 @@ def solve_dfs(start: Grid,
     successors = get_successors(curr_grid, use_mcv, use_lcv)
     
     #successors come in as list, but that list needs to have its order preserved for stack...
-    for i in range(len(successors)-1,0,-1): #last goes first
+    for i in range(len(successors)-1,-1,-1): #last goes first
       state_key = grid_to_key(successors[i])
       if state_key in visited:
         continue
       visited.add(state_key)
-      stack.append((state_key,curr_depth+1))
+      stack.append((successors[i],curr_depth+1))
   
   return None, {
     "success": False,
@@ -694,25 +694,24 @@ if __name__ == "__main__":
 
     # Choose ONE loader:
     # puzzle = load_sudoku()
-    puzzle = load_sudoku_from_file("Sudoku_Puzzles.txt")
+    # puzzle = load_sudoku_from_file("Sudoku_Puzzles.txt")
 
+    # print("Loaded Sudoku:")
+    # print_sudoku(puzzle)
 
-    print("Loaded Sudoku:")
-    print_sudoku(puzzle)
+    # # A* solve:
+    # a_solution, a_stats = a_star_sudoku(puzzle, use_mcv=True, use_lcv=False, time_limit=10)
+    # print("A* stats:", a_stats)
+    # if a_solution:
+    #     print("Solved (A*):")
+    #     print_sudoku(a_solution)
 
-    # A* solve:
-    a_solution, a_stats = a_star_sudoku(puzzle, use_mcv=True, use_lcv=False, time_limit=10)
-    print("A* stats:", a_stats)
-    if a_solution:
-        print("Solved (A*):")
-        print_sudoku(a_solution)
-
-    # DFS solve:
-    d_solution, d_stats = solve_dfs(puzzle, use_mcv=True, use_lcv=True, time_limit=10)
-    print("DFS stats:", d_stats)
-    if d_solution:
-        print("Solved (DFS):")
-        print_sudoku(d_solution)
+    # # DFS solve:
+    # d_solution, d_stats = solve_dfs(puzzle, use_mcv=True, use_lcv=True, time_limit=10)
+    # print("DFS stats:", d_stats)
+    # if d_solution:
+    #     print("Solved (DFS):")
+    #     print_sudoku(d_solution)
 
     # (Optional) BFS:
     # b_solution, b_stats = solve_bfs(puzzle)
@@ -720,3 +719,11 @@ if __name__ == "__main__":
     # if b_solution:
     #     print("Solved (BFS):")
     #     print_sudoku(b_solution)
+    
+    search_algs = Enum("A_star","DFS")
+    
+    expirement_stats = []
+    
+    #EXPIREMENTS
+    #1. Running A* and DFS with Easy Medium and Hard puzzles
+    expirement_stats.append
