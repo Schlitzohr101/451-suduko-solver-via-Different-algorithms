@@ -415,8 +415,8 @@ def a_star_sudoku(start: Grid,
                   use_lcv: bool = False,
                   time_limit: Optional[float] = None):
   
-    nodesExpanded = 0
-    maxFrontier = 0
+    nodes_expanded = 0
+    max_frontier = 0
     
     frontier = []
     tie_breaker = 0
@@ -430,11 +430,20 @@ def a_star_sudoku(start: Grid,
     visited = set()
     visited.add(grid_to_key(start))
     
-    startTime = time.time()
+    start_time = time.time()
     
     while frontier:
+      #adding check for time
+      curr_time = time.time() - start_time
+      if time_limit and (curr_time) > time_limit:
+        return None, {
+          "success": False,
+          "nodes_expanded": nodes_expanded,
+          "max_frontier": max_frontier,
+          "time": curr_time}
+        
       #update values...
-      maxFrontier = max(maxFrontier, len(frontier))
+      max_frontier = max(max_frontier, len(frontier))
       #current node is popped from heapq, which has lowest f value...
       f_curr, g_curr, _ , grid_curr = heapq.heappop(frontier)
       tie_breaker += 1
@@ -443,12 +452,12 @@ def a_star_sudoku(start: Grid,
       if is_goal(grid_curr):
         return (grid_curr, 
                 {"success": True, 
-                 "nodes_expanded": nodesExpanded,
-                 "max_frontier": maxFrontier,
-                 "time": time.time() - startTime}
+                 "nodes_expanded": nodes_expanded,
+                 "max_frontier": max_frontier,
+                 "time": time.time() - start_time}
                 )
       #not goal, so lets expand more...
-      nodesExpanded += 1
+      nodes_expanded += 1
       succesors = get_successors(grid_curr, use_mcv, use_lcv)
       
       for state in succesors:
@@ -468,9 +477,9 @@ def a_star_sudoku(start: Grid,
     #if we get here we failed
     return None, {
       "success": False,
-      "nodes_expanded": nodesExpanded,
-      "max_frontier": maxFrontier,
-      "time": time.time() - startTime}
+      "nodes_expanded": nodes_expanded,
+      "max_frontier": max_frontier,
+      "time": time.time() - start_time}
       
         
     """
@@ -509,23 +518,76 @@ def solve_dfs(start: Grid,
               use_lcv: bool = True,
               depth_limit: Optional[int] = None,
               time_limit: Optional[float] = None):
-    """
-    Solves Sudoku using uninformed Depth-First Search (stack-based or recursion).
-    Returns: (solution_grid or None, stats_dict)
+  #initial values
+  start_time = time.time()
+  nodes_expanded = 0
+  max_frontier = 0
+  stack = [(start, 0)]# starting node plus depth
+  visited = set()
+  visited.add(grid_to_key(start))
+  
+  while stack:
+    curr_time = time.time() - start_time
+    if time_limit and curr_time > time_limit:
+      return None, {
+      "success": False,
+      "nodes_expanded": nodes_expanded,
+      "max_frontier": max_frontier,
+      "time": curr_time}
+    
+    #update...
+    max_frontier = max(max_frontier, len(stack))
+    
+    curr_grid, curr_depth = stack.pop()
+    
+    if depth_limit and curr_depth > depth_limit:
+      continue
+    
+    if is_goal(curr_grid):
+      return {"success": True, 
+                 "nodes_expanded": nodes_expanded,
+                 "max_frontier": max_frontier,
+                 "time": time.time() - start_time}
+    
+    nodes_expanded += 1
+    successors = get_successors(curr_grid, use_mcv, use_lcv)
+    
+    #successors come in as list, but that list needs to have its order preserved for stack...
+    for i in range(start=len(successors)-1,stop=0,step=-1): #last goes first
+      state_key = grid_to_key(successors[i])
+      if state_key in visited:
+        continue
+      visited.add(state_key)
+      stack.append((state_key,curr_depth+1))
+  
+  return None, {
+    "success": False,
+    "nodes_expanded": nodes_expanded,
+    "max_frontier": max_frontier,
+    "time": time.time() - start_time}
+  
+      
+    
+    
+    
+    
+  """
+  Solves Sudoku using uninformed Depth-First Search (stack-based or recursion).
+  Returns: (solution_grid or None, stats_dict)
 
-    Required behavior:
-      - Use a stack (LIFO) or recursion for DFS.
-      - Enhance with MCV (variable choice) and optional LCV (value ordering).
-      - Maintain a visited set keyed by grid_to_key to avoid duplicate expansions.
-      - Track stats: nodes_expanded, max_frontier (stack max size), elapsed_time.
-      - Respect depth_limit and/or time_limit; if hit, return success=False with reason.
+  Required behavior:
+    - Use a stack (LIFO) or recursion for DFS.
+    - Enhance with MCV (variable choice) and optional LCV (value ordering).
+    - Maintain a visited set keyed by grid_to_key to avoid duplicate expansions.
+    - Track stats: nodes_expanded, max_frontier (stack max size), elapsed_time.
+    - Respect depth_limit and/or time_limit; if hit, return success=False with reason.
 
-    TODO:
-      - Implement DFS using get_successors with chosen flags.
-      - Stop and return solution as soon as is_goal(grid) is True.
-    """
-    # TODO
-    raise NotImplementedError("solve_dfs: implement DFS search")
+  TODO:
+    - Implement DFS using get_successors with chosen flags.
+    - Stop and return solution as soon as is_goal(grid) is True.
+  """
+  # TODO
+  raise NotImplementedError("solve_dfs: implement DFS search")
 
 
 # ========================
@@ -610,11 +672,11 @@ if __name__ == "__main__":
         print_sudoku(a_solution)
 
     # DFS solve:
-    # d_solution, d_stats = solve_dfs(puzzle, use_mcv=True, use_lcv=True, time_limit=10)
-    # print("DFS stats:", d_stats)
-    # if d_solution:
-    #     print("Solved (DFS):")
-    #     print_sudoku(d_solution)
+    d_solution, d_stats = solve_dfs(puzzle, use_mcv=True, use_lcv=True, time_limit=10)
+    print("DFS stats:", d_stats)
+    if d_solution:
+        print("Solved (DFS):")
+        print_sudoku(d_solution)
 
     # (Optional) BFS:
     # b_solution, b_stats = solve_bfs(puzzle)
