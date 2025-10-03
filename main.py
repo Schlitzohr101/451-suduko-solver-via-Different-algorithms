@@ -23,6 +23,7 @@ from operator import sub, truediv
 from pdb import run
 import random
 import heapq
+import statistics
 import time
 import os
 from enum import Enum
@@ -678,8 +679,65 @@ def print_sudoku(grid: Grid) -> None:
   # # TODO
   # raise NotImplementedError("print_sudoku: format and print the board")
 
-def stat_print():
-  raise NotImplementedError("stat print")
+def stats_for_algo(experiment_stats: List[Tuple], algorithm: search_algs):
+  # raise NotImplementedError("stat print")
+  
+  # Filter experiments for the specified algorithm
+  algorithm_experiments = [
+    exp for exp in experiment_stats 
+    if exp[0] == algorithm
+  ]
+
+  if not algorithm_experiments:
+    raise("Failed to get algorithm for experiments!")
+  
+  solution = algorithm[2][0]
+  times = [stats["time"] for _, _ ,(_, stats) in algorithm_experiments]
+  nodes = [stats["nodes_expanded"] for _, _ ,(_, stats) in algorithm_experiments]
+  frontiers = [stats["max_frontier"] for _, _ ,(_, stats) in algorithm_experiments]
+  
+  return {
+    "algorithm": algorithm.name,
+    "avg_time": statistics.mean(times),
+    "avg_nodes_expanded" : statistics.mean(nodes),
+    "avg_max_frontier": statistics.mean(frontiers),
+    "solution":solution
+  }
+  
+
+
+def stats_for_algo_by_diff(experiment_stats: List[Tuple], difficulty: prob_diff):
+    # Filter experiments for the specified difficulty
+  algorithm_experiments = [
+    exp for exp in experiment_stats 
+    if exp[1] == prob_diff
+  ]
+
+  if not algorithm_experiments:
+    raise("Failed to get algorithm for experiments!")
+  
+  stats_by_algo = {}
+  
+  #get list of breakdown per algo
+  for algo, _, expr in algorithm_experiments:
+    if algo not in stats_by_algo:
+      stats_by_algo[algo].append(expr)
+    
+  result = {}  
+    
+  for algo, algo_stats in stats_by_algo.items():
+    solution = algo_stats[0]
+    times = [s["time"] for _,s in algo_stats]
+    nodes = [s["nodes_expanded"] for _,s in algo_stats]
+    frontier = [s["max_frontier"] for _,s in algo_stats]
+    result[algo] = {
+                "avg_time": statistics.mean(times),
+                "avg_nodes_expanded": statistics.mean(nodes),
+                "avg_max_frontier":statistics.mean(frontier),
+                "solution_state":solution
+            }
+
+  return result
 
 if __name__ == "__main__":
 
@@ -727,32 +785,32 @@ if __name__ == "__main__":
   
 
   
-  expirement_stats = []
+  experiment_stats = []
   
   #EXPIREMENTS
   #1. Running A* and DFS with Easy Medium and Hard puzzles
   #Easy
   puzzle = load_sudoku_from_file("Sudoku_Puzzles.txt")
   easy_puzzle = puzzle
-  expirement_stats.append( (search_algs.A_star, prob_diff.Easy, a_star_sudoku(puzzle,time_limit=10))  )
-  expirement_stats.append( (search_algs.DFS, prob_diff.Easy, solve_dfs(puzzle, time_limit=10)))
+  experiment_stats.append( (search_algs.A_star, prob_diff.Easy, a_star_sudoku(puzzle,time_limit=10))  )
+  experiment_stats.append( (search_algs.DFS, prob_diff.Easy, solve_dfs(puzzle, time_limit=10)))
   
   #Medium
   puzzle = load_sudoku_from_file("Sudoku_Puzzles_Medium.txt")
   med_puzzle = puzzle
-  expirement_stats.append( (search_algs.A_star, prob_diff.Medium, a_star_sudoku(puzzle,time_limit=10))  )
-  expirement_stats.append( (search_algs.DFS, prob_diff.Medium, solve_dfs(puzzle, time_limit=10)))
+  experiment_stats.append( (search_algs.A_star, prob_diff.Medium, a_star_sudoku(puzzle,time_limit=10))  )
+  experiment_stats.append( (search_algs.DFS, prob_diff.Medium, solve_dfs(puzzle, time_limit=10)))
 
   #Hard
   puzzle = load_sudoku_from_file("Sudoku_Puzzles_Hard.txt")
   hard_puzzle = puzzle
-  expirement_stats.append( (search_algs.A_star, prob_diff.Medium, a_star_sudoku(puzzle,time_limit=10))  )
-  expirement_stats.append( (search_algs.DFS, prob_diff.Medium, solve_dfs(puzzle, time_limit=10)))
+  experiment_stats.append( (search_algs.A_star, prob_diff.Medium, a_star_sudoku(puzzle,time_limit=10))  )
+  experiment_stats.append( (search_algs.DFS, prob_diff.Medium, solve_dfs(puzzle, time_limit=10)))
 
   A_star_stats = []
   DFS_stats = []
 
-  for stat_group in expirement_stats:
+  for stat_group in experiment_stats:
     match stat_group[0]:
       case search_algs.A_star:
         A_star_stats.append((stat_group[1],stat_group[2]))
@@ -764,11 +822,15 @@ if __name__ == "__main__":
   print("Expriement results...")
   print("Easy puzzle:")
   print_sudoku(easy_puzzle)
-  print("A_star:",end="\n")
-  for stats_group in A_star_stats:
-    match stats_group[0]:
-      case prob_diff.Easy:
-        print("successful A * search" if stats_group[1][1]["success"] else "A * search failed")
-        print_sudoku(stats_group[1][0]) if stats_group[1][1]["success"] else print()
-      case _:
-        continue
+  easy_solutions = stats_for_algo_by_diff(experiment_stats,prob_diff.Easy)
+  
+  
+  # print_sudoku(easy_puzzle)
+  # print("A_star:",end="\n")
+  # for stats_group in A_star_stats:
+  #   match stats_group[0]:
+  #     case prob_diff.Easy:
+  #       print("successful A * search" if stats_group[1][1]["success"] else "A * search failed")
+  #       print_sudoku(stats_group[1][0]) if stats_group[1][1]["success"] else print()
+  #     case _:
+  #       continue
