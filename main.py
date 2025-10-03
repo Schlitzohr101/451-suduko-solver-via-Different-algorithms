@@ -264,6 +264,7 @@ def find_most_constrained_cell(grid: Grid) -> Optional[Tuple[int, int, List[int]
     return None    
 
 def get_successors(grid: Grid, use_mcv: bool = True, use_lcv: bool = False) -> List[Grid]:
+  
     """
     Generates next states by filling ONE empty cell with each valid value.
 
@@ -386,6 +387,43 @@ def a_star_sudoku(start: Grid,
                   use_mcv: bool = True,
                   use_lcv: bool = False,
                   time_limit: Optional[float] = None):
+  
+    nodesExpanded = 0
+    maxFrontier = 0
+    
+    frontier = []
+    tie_breaker = 0
+    
+    g_start = 0
+    h_start = heuristic(start)
+    f_start = g_start + h_start
+    
+    heapq.heappush(frontier, (f_start, g_start, tie_breaker, start))
+    
+    visited = set()
+    visited.add(grid_to_key(start))
+    
+    startTime = time.time()
+    
+    while frontier:
+      #update values...
+      maxFrontier = max(maxFrontier, len(frontier))
+      #current node is popped from heapq, which has lowest f value...
+      f_curr, g_curr, _ , grid_curr = heapq.heappop(frontier)
+      tie_breaker += 1
+      
+      #check goal is the current grid
+      if is_goal(grid_curr):
+        return (grid_curr, 
+                {"success": True, 
+                 "nodes_expanded": nodesExpanded,
+                 "max_frontier": maxFrontier,
+                 "time": time.time() - startTime}
+                )
+      #not goal, so lets expand more...
+      nodesExpanded += 1
+      
+        
     """
     Solves Sudoku using A* search.
     Returns: (solution_grid or None, stats_dict)
