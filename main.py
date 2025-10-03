@@ -701,7 +701,7 @@ def stats_for_algo(experiment_stats: List[Tuple], algorithm: search_algs):
     "avg_time": statistics.mean(times),
     "avg_nodes_expanded" : statistics.mean(nodes),
     "avg_max_frontier": statistics.mean(frontiers),
-    "solution":solution
+    "solution_state":solution
   }
   
 
@@ -710,7 +710,7 @@ def stats_for_algo_by_diff(experiment_stats: List[Tuple], difficulty: prob_diff)
     # Filter experiments for the specified difficulty
   algorithm_experiments = [
     exp for exp in experiment_stats 
-    if exp[1] == prob_diff
+    if exp[1] == difficulty
   ]
 
   if not algorithm_experiments:
@@ -721,12 +721,13 @@ def stats_for_algo_by_diff(experiment_stats: List[Tuple], difficulty: prob_diff)
   #get list of breakdown per algo
   for algo, _, expr in algorithm_experiments:
     if algo not in stats_by_algo:
-      stats_by_algo[algo].append(expr)
+      stats_by_algo[algo.name] = []
+    stats_by_algo[algo.name].append(expr)
     
   result = {}  
     
   for algo, algo_stats in stats_by_algo.items():
-    solution = algo_stats[0]
+    solution = algo_stats[0][0]
     times = [s["time"] for _,s in algo_stats]
     nodes = [s["nodes_expanded"] for _,s in algo_stats]
     frontier = [s["max_frontier"] for _,s in algo_stats]
@@ -738,6 +739,16 @@ def stats_for_algo_by_diff(experiment_stats: List[Tuple], difficulty: prob_diff)
             }
 
   return result
+
+def print_out_stats_by_algo(experiments: dict):
+  for algo, stats in experiments.items():
+    print(f"\n{algo}:")
+    # print(stats)
+    print(f"  Average Time: {stats['avg_time']:.4f}s")
+    print(f"  Average Nodes: {stats['avg_nodes_expanded']:.1f}")
+    print(f"  Average Max Frontier: {stats['avg_max_frontier']:.1f}")
+    print(f"Solution for {algo}:")
+    print_sudoku(stats.get("solution_state"))
 
 if __name__ == "__main__":
 
@@ -804,8 +815,8 @@ if __name__ == "__main__":
   #Hard
   puzzle = load_sudoku_from_file("Sudoku_Puzzles_Hard.txt")
   hard_puzzle = puzzle
-  experiment_stats.append( (search_algs.A_star, prob_diff.Medium, a_star_sudoku(puzzle,time_limit=10))  )
-  experiment_stats.append( (search_algs.DFS, prob_diff.Medium, solve_dfs(puzzle, time_limit=10)))
+  experiment_stats.append( (search_algs.A_star, prob_diff.Hard, a_star_sudoku(puzzle,time_limit=10))  )
+  experiment_stats.append( (search_algs.DFS, prob_diff.Hard, solve_dfs(puzzle, time_limit=10)))
 
   A_star_stats = []
   DFS_stats = []
@@ -823,6 +834,7 @@ if __name__ == "__main__":
   print("Easy puzzle:")
   print_sudoku(easy_puzzle)
   easy_solutions = stats_for_algo_by_diff(experiment_stats,prob_diff.Easy)
+  print_out_stats_by_algo(easy_solutions)
   
   
   # print_sudoku(easy_puzzle)
