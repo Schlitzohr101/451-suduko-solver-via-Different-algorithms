@@ -29,6 +29,9 @@ from enum import Enum
 from pathlib import Path
 from typing import List, Tuple, Optional, Set
 
+search_algs = Enum("Search algorithms","A_star DFS")
+prob_diff = Enum("problem difficulty","Easy Medium Hard")
+
 # SubBoxesRows = Enum('SubBoxRows', [('Top', 1),('Middle',2),('Bottom',3)])
 
 # SubBoxesCols = Enum('SubBoxCols', [('Left', 1), ('Middle',2), ('Right',3)])
@@ -675,6 +678,8 @@ def print_sudoku(grid: Grid) -> None:
   # # TODO
   # raise NotImplementedError("print_sudoku: format and print the board")
 
+def stat_print():
+  raise NotImplementedError("stat print")
 
 if __name__ == "__main__":
 
@@ -720,8 +725,7 @@ if __name__ == "__main__":
   #     print("Solved (BFS):")
   #     print_sudoku(b_solution)
   
-  search_algs = Enum("Search algorithms","A_star DFS")
-  prob_diff = Enum("problem difficulty","Easy Medium Hard")
+
   
   expirement_stats = []
   
