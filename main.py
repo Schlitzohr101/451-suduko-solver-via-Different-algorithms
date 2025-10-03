@@ -262,7 +262,33 @@ def find_most_constrained_cell(grid: Grid) -> Optional[Tuple[int, int, List[int]
             smallestDomainPos = (row,col)
     if smallestDomain != []:
        return (smallestDomainPos[0],smallestDomainPos[1],smallestDomain)  
-    return None    
+    return None  
+  
+def count_constraints_for_val(grid: Grid, row: int, col: int, val: int) :
+  constraints= 0
+  #col constraints
+  for curr_col in range(9): #(0 - 9)
+    if curr_col != col and grid[curr_col][row] == 0: #not where we are and empty
+      if val in legal_values(grid,row,curr_col):
+        constraints+= 1
+  #row
+  for curr_row in range(9):
+    if curr_row != row and grid[col][curr_row] == 0:
+      if val in legal_values(grid,curr_row,col):
+        constraints+= 1
+        
+        
+  sub_box_row_floor= (row//3) * 3
+  sub_box_col_floor= (col//3) * 3
+  #sub box constraints
+  for curr_col in range(sub_box_col_floor, sub_box_col_floor+3):
+    for curr_row in range(sub_box_row_floor, sub_box_row_floor+3):
+      if (curr_row, curr_col) != (row, col) and grid[curr_col][curr_row] == 0:
+        constraints+= 1
+        
+  return constraints
+        
+  
 
 def get_successors(grid: Grid, use_mcv: bool = True, use_lcv: bool = False) -> List[Grid]:
   successors = []
@@ -281,9 +307,19 @@ def get_successors(grid: Grid, use_mcv: bool = True, use_lcv: bool = False) -> L
     row, col = empty_cell_pos
     candidates = legal_values(grid, row, col)
     
-  if use_lcv:
-    raise NotImplementedError("get_successors: order candidates using LCV")
-    # maybe implemnt later...
+  if use_lcv and candidates:
+    candidates.sort(key = lambda val: count_constraints_for_val(grid,row,col,val)) #lambda is a placeholder funct
+    #so this will run the key function which is a lamba funct that takes in the value currently being examined by the sort
+    
+    
+    # raise NotImplementedError("get_successors: order candidates using LCV")
+    # # maybe implemnt later...
+    # #need to find out which in candidates is the least constraining...
+    # #got to loop through grid O_o
+    # for curr_col in range(9): #(0 - 9)
+    #   if curr_col != col and grid[curr_col][row] == 0: #not where we are and empty
+    #screw this just going to use sort and a function
+    
 
   for value in candidates: #for each value in the possible candidates create states with the values and add to succ
     new_grid = copy.deepcopy(grid)
