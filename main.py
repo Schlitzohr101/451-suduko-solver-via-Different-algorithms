@@ -847,6 +847,7 @@ if __name__ == "__main__":
   puzzle = load_sudoku_from_file("Sudoku_Puzzles_Medium.txt")
 
   a_start_with_lcv = a_star_sudoku(puzzle,use_mcv=True,time_limit=10)
+  dfs_without_lcv = a_star_sudoku(puzzle, use_mcv=False, use_lcv=False, time_limit=10)
   print("With LCV ")
   
   print(f"  Average Time: {a_start_with_lcv[1]['time']:.4f}s")
@@ -858,8 +859,19 @@ if __name__ == "__main__":
   print(f"  Average Time: {a_start_without_lcv[1]['time']:.4f}s")
   print(f"  Average Nodes: {a_start_without_lcv[1]['nodes_expanded']:d}")
   print(f"  Average Max Frontier: {a_start_without_lcv[1]['max_frontier']:d}")
-    
-
+  
+  print("\nCompare DFS with and without MCV/LCV")
+  print("With : ")
+  
+  print(f"  Average Time: {dfs_with_lcv[1]['time']:.4f}s")
+  print(f"  Average Nodes: {dfs_with_lcv[1]['nodes_expanded']:d}")
+  print(f"  Average Max Frontier: {dfs_with_lcv[1]['max_frontier']:d}")
+  
+  print("Without : ")
+  
+  print(f"  Average Time: {dfs_without_lcv[1]['time']:.4f}s")
+  print(f"  Average Nodes: {dfs_without_lcv[1]['nodes_expanded']:d}")
+  print(f"  Average Max Frontier: {dfs_without_lcv[1]['max_frontier']:d}")
   
   # print_sudoku(easy_puzzle)
   # print("A_star:",end="\n")
