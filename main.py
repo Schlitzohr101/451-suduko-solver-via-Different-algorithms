@@ -419,11 +419,42 @@ def is_goal(grid: Grid) -> bool:
 # ========================
 
 def heuristic(grid: Grid) -> int:
-  zeroCount = 0
-  for row in grid:
-    for item in row:
-      if item == 0 : zeroCount+=1
-  return zeroCount
+  # zeroCount = 0
+  # for row in grid:
+  #   for item in row:
+  #     if item == 0 : zeroCount+=1
+  # return zeroCount
+  empty_cells = 0
+  total_domain_size = 0
+  min_domain_size = 10
+  constraint_penalty = 0
+  
+  for row in range(9):
+    for col in range(9):
+      if grid[row][col] ==0:
+        empty_cells += 1
+        domain = legal_values(grid,row, col)
+        domain_size = len(domain)
+        
+        if domain_size == 0:
+          return float("inf")
+        
+        total_domain_size += domain_size
+        min_domain_size = min(min_domain_size, domain_size)
+        
+        if domain_size == 1:
+          constraint_penalty += 0
+        elif domain_size == 2:
+          constraint_penalty += 0.1
+        else:
+          constraint_penalty += (0.2 * (domain_size-2))
+
+  if empty_cells == 0:
+    return 0
+  
+  avg_domain_size = total_domain_size / empty_cells if empty_cells > 0 else 0
+  
+  return empty_cells + (avg_domain_size * 0.1) + (constraint_penalty * 0.05)
 
   """
   Heuristic for A*.
