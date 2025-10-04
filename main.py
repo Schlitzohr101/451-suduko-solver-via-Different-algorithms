@@ -61,9 +61,8 @@ def load_sudoku() -> Grid:
             [0, 0, 0, 4, 1, 9, 0, 0, 5],
             [0, 0, 0, 0, 8, 0, 0, 7, 9]
         ],
-        "puzzle2": [
-            ],
     }
+    return random.choice(puzzles)
     """
     Returns a randomly chosen Sudoku puzzle from a predefined list.
 
@@ -462,7 +461,7 @@ def a_star_sudoku(start: Grid,
     tie_breaker = 0
     
     g_start = 0
-    h_start = heuristic(start)
+    h_start = heuristic(grid_to_key(start))
     f_start = g_start + h_start
     
     heapq.heappush(frontier, (f_start, g_start, tie_breaker, start))
@@ -509,7 +508,7 @@ def a_star_sudoku(start: Grid,
         
         #calc scores for this state
         state_g = g_curr + 1
-        state_h = heuristic(state_key)
+        state_h = heuristic(state)
         state_f = state_g + state_h
         
         # add state with scores to frontier
@@ -575,9 +574,6 @@ def solve_dfs(start: Grid,
       "max_frontier": max_frontier,
       "time": curr_time}
     
-    #update...
-    max_frontier = max(max_frontier, len(stack))
-    
     curr_grid, curr_depth = stack.pop()
     
     if depth_limit and curr_depth > depth_limit:
@@ -599,6 +595,9 @@ def solve_dfs(start: Grid,
         continue
       visited.add(state_key)
       stack.append((successors[i],curr_depth+1))
+      
+    #update...
+    max_frontier = max(max_frontier, len(stack))
   
   return None, {
     "success": False,
@@ -653,18 +652,21 @@ def solve_bfs(start: Grid):
 
 def print_sudoku(grid: Grid) -> None:
   final_str = ""
-  grid_key = grid_to_key(grid)
-  row_count = 0
-  for row in grid_key:
-    final_str += ("\n- - - | - - - | - - -\n" if row_count % 3 == 0 else "\n")
-    
-    cell_count = 1
-    for cell in row:
-      final_str += str(cell)
-      final_str += (" | " if cell_count%3 == 0 and cell_count > 0 and cell_count < 8 else " ")
-      cell_count += 1
-    row_count += 1
-  final_str += ("\n- - - | - - - | - - -\n")
+  if grid != None:
+    grid_key = grid_to_key(grid)
+    row_count = 0
+    for row in grid_key:
+      final_str += ("\n- - - | - - - | - - -\n" if row_count % 3 == 0 else "\n")
+      
+      cell_count = 1
+      for cell in row:
+        final_str += str(cell)
+        final_str += (" | " if cell_count%3 == 0 and cell_count > 0 and cell_count < 8 else " ")
+        cell_count += 1
+      row_count += 1
+    final_str += ("\n- - - | - - - | - - -\n")
+  else:
+    final_str = "None"
   print(final_str)
   
   
@@ -797,6 +799,9 @@ if __name__ == "__main__":
 
   
   experiment_stats = []
+  a_start_without_lcv = None
+  dfs_with_lcv = None
+  
   
   #EXPIREMENTS
   #1. Running A* and DFS with Easy Medium and Hard puzzles
@@ -805,11 +810,15 @@ if __name__ == "__main__":
   easy_puzzle = puzzle
   experiment_stats.append( (search_algs.A_star, prob_diff.Easy, a_star_sudoku(puzzle,time_limit=10))  )
   experiment_stats.append( (search_algs.DFS, prob_diff.Easy, solve_dfs(puzzle, time_limit=10)))
+
+  
   
   #Medium
   puzzle = load_sudoku_from_file("Sudoku_Puzzles_Medium.txt")
   med_puzzle = puzzle
-  experiment_stats.append( (search_algs.A_star, prob_diff.Medium, a_star_sudoku(puzzle,time_limit=10))  )
+  a_start_without_lcv = a_star_sudoku(puzzle,time_limit=10)
+  experiment_stats.append( (search_algs.A_star, prob_diff.Medium, a_start_without_lcv)  )
+  dfs_with_lcv = solve_dfs(puzzle, time_limit=10)
   experiment_stats.append( (search_algs.DFS, prob_diff.Medium, solve_dfs(puzzle, time_limit=10)))
 
   #Hard
@@ -817,25 +826,40 @@ if __name__ == "__main__":
   hard_puzzle = puzzle
   experiment_stats.append( (search_algs.A_star, prob_diff.Hard, a_star_sudoku(puzzle,time_limit=10))  )
   experiment_stats.append( (search_algs.DFS, prob_diff.Hard, solve_dfs(puzzle, time_limit=10)))
-
-  A_star_stats = []
-  DFS_stats = []
-
-  for stat_group in experiment_stats:
-    match stat_group[0]:
-      case search_algs.A_star:
-        A_star_stats.append((stat_group[1],stat_group[2]))
-      case search_algs.DFS:
-        DFS_stats.append((stat_group[1],stat_group[2]))
-      case _:
-        raise("issue with handling of search algs Enum for stat sorting...")
-      
+  
   print("Expriement results...")
   print("Easy puzzle:")
   print_sudoku(easy_puzzle)
   easy_solutions = stats_for_algo_by_diff(experiment_stats,prob_diff.Easy)
   print_out_stats_by_algo(easy_solutions)
   
+  print("\n\nMedium puzzle:")
+  print_sudoku(med_puzzle)
+  medium_solutions = stats_for_algo_by_diff(experiment_stats,prob_diff.Medium)
+  print_out_stats_by_algo(medium_solutions)
+  
+  print("\n\nHard puzzle:")
+  print_sudoku(hard_puzzle)
+  hard_solutions = stats_for_algo_by_diff(experiment_stats,prob_diff.Hard)
+  print_out_stats_by_algo(hard_solutions)
+  
+  print("\nCompare A* with and without LCV")
+  puzzle = load_sudoku_from_file("Sudoku_Puzzles_Medium.txt")
+
+  a_start_with_lcv = a_star_sudoku(puzzle,use_mcv=True,time_limit=10)
+  print("With LCV ")
+  
+  print(f"  Average Time: {a_start_with_lcv[1]['time']:.4f}s")
+  print(f"  Average Nodes: {a_start_with_lcv[1]['nodes_expanded']:d}")
+  print(f"  Average Max Frontier: {a_start_with_lcv[1]['max_frontier']:d}")
+
+  print("Without LCV ")
+  
+  print(f"  Average Time: {a_start_without_lcv[1]['time']:.4f}s")
+  print(f"  Average Nodes: {a_start_without_lcv[1]['nodes_expanded']:d}")
+  print(f"  Average Max Frontier: {a_start_without_lcv[1]['max_frontier']:d}")
+    
+
   
   # print_sudoku(easy_puzzle)
   # print("A_star:",end="\n")
